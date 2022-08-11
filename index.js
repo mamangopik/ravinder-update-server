@@ -7,7 +7,7 @@ const port = 3000
 app.use('/files', express.static('public'))
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('Ravinder Update Server')
 })
 app.get('/dev/ravinder-update-path', (req, res) => {
     res.json({"script_link": version.script_link})
