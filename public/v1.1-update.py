@@ -8,7 +8,7 @@ try:
     subprocess.call(["raspi-config", "--expand-rootfs"])
     with open("/home/ravinder/log/update.log", "a+") as file:
         file.write("update to v1.1 success\n")
-    with open("/home/ravinder-base/version", "w+") as f:
+    with open("/home/ravinder/ravinder-base/version", "w+") as f:
         f.write("1.1")
     subprocess.call(['shutdown', '-r', 'now'])
     sys.exit(0)
