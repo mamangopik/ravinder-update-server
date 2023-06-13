@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const version = require('./v2.1/version.json')
-const port = 3000
+const port = 6000
 
 
 app.use('/files', express.static('public'))
