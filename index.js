@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const version = require('./v2.1/version.json')
+const version = require('./v2.2/version.json')
 const port = 6000
 
 
