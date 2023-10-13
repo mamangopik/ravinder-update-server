@@ -4,7 +4,7 @@ const version = require('./v3.0/version.json')
 const port = 6501
 
 
-app.use('/files', express.static('public'))
+app.use('/files-dev', express.static('public'))
 
 app.get('/', (req, res) => {
   res.send('Ravinder Update Server')
