@@ -7,13 +7,19 @@ import subprocess
 import time
 from subprocess import call
 from subprocess import DEVNULL
-from gpiozero import Buzzer
 import schedule
 import sys
 import dotenv
 
+# from gpiozero import Buzzer
+
+# Define the list of network interfaces to test
+interfaces = ["wwan0","wlo1","eno1"]
+test_server = "8.8.8.8"
+ping_result = {}
+
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s:%(lineno)d"
-MODEM_LOG_FILE = '/home/ravinder/log/modem.log'
+MODEM_LOG_FILE = '/home/hidayat/log/modem.log'
 modem_logger = logging.getLogger('modem_logging')
 modem_logger.setLevel(logging.DEBUG)
 modem_logger_file = TimedRotatingFileHandler(
@@ -22,23 +28,27 @@ modem_logger_file.setLevel(logging.DEBUG)
 modem_logger_file.setFormatter(Formatter(LOG_FORMAT))
 modem_logger.addHandler(modem_logger_file)
 
-server_config_file = dotenv.find_dotenv('/etc/config/server.conf')
-current_server_config = dotenv.dotenv_values(server_config_file)
 
+# def resetModemPwr():
+#     modemRst = Buzzer(26)
+#     modem_logger.info("Hard Reset Modem")
+#     modemRst.on()
+#     time.sleep(3)
+#     modemRst.off()
+#     time.sleep(10)
 
-def ping():
-    pingRc = call(['ping', '-I', 'wwan0', '-c1', '-w10', '-s0', '8.8.8.8'], stdout=DEVNULL, stderr=DEVNULL)
-    pingServer = call(['ping', '-c1', '-w10', '-s0', current_server_config["ADSB_SBS1_HOST"]], stdout=DEVNULL, stderr=DEVNULL)
-    return pingRc, pingServer
-
-
-def resetModemPwr():
-    modemRst = Buzzer(26)
-    modem_logger.info("Hard Reset Modem")
-    modemRst.on()
-    time.sleep(3)
-    modemRst.off()
-    time.sleep(10)
+def get_ping_metrics(interface):
+    ping_result = subprocess.call(
+        ["ping", "-I", interface, "-c", "4", "-q", test_server]
+    )
+    ping_result=str(ping_result)
+    print("Result",ping_result)
+    RC = int(ping_result.split('\n')[-1])
+    try:
+        return RC
+    except subprocess.CalledProcessError as e:
+        # Handle errors, e.g., if ping fa3.ils
+        return None, None
 
 
 def restart_service():
@@ -81,37 +91,16 @@ def soft_reset_modem():
     else:
         modem_logger.error('restart modem failed')
 
-#schedule.every(5).minutes.do(restart_service)
 
 
 def main():
-    failCount = 0
-    afterDown = False
-
-    time.sleep(3)
-
-    while True:
-        rc = ping()
-        if(rc[1]):
-            dotenv.set_key(server_config_file, "HAS_CONNECTION",
-                           "False", quote_mode="never")
-        else:
-            dotenv.set_key(server_config_file, "HAS_CONNECTION",
-                "True", quote_mode="never")
-
-        # if ping no response success after 10s
-        if rc[0]:
-            if failCount < 7:
-                failCount += 1
-                modem_logger.info('Connection Down')
-                soft_reset_modem()
-            else:
-                pass
-        else:
-            failCount = 0
-
-
-        time.sleep(10)
+    while 1:
+        for interface in interfaces:
+            print(f"============{interface}==============")
+            RC = get_ping_metrics(interface)
+            print("RC=",RC)
+            print(f"============{interface}==============\n\n")   
+        time.sleep(3)
 
 
 if __name__ == "__main__":
