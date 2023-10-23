@@ -26,8 +26,11 @@ modem_logger_file.setLevel(logging.DEBUG)
 modem_logger_file.setFormatter(Formatter(LOG_FORMAT))
 modem_logger.addHandler(modem_logger_file)
 
-server_config_file = dotenv.find_dotenv('/etc/config/server.conf')
-current_server_config = dotenv.dotenv_values(server_config_file)
+try:
+    server_config_file = dotenv.find_dotenv('/etc/config/server.conf')
+    current_server_config = dotenv.dotenv_values(server_config_file)
+except Exception as e:
+    modem_logger.error(str(e))
 
 try:
     from gpiozero import Buzzer
