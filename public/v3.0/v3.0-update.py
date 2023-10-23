@@ -8,7 +8,7 @@ try:
     
     subprocess.call(["mkdir", "/home/ravinder/update_temp"])
     os.chdir("/home/ravinder/update_temp/")
-    subprocess.call(["wget", "http://bnpd.nutech-integrasi.com/files/v3.0/v3.0.tar.xz", "-O", "/home/ravinder/update_temp/v3.0.tar.xz", "--backups=0"])
+    subprocess.call(["wget", "http://bnpd.nutech-integrasi.com/files-dev/v3.0/v3.0.tar.xz", "-O", "/home/ravinder/update_temp/v3.0.tar.xz", "--backups=0"])
     subprocess.call(["tar", "-xf", "/home/ravinder/update_temp/v3.0.tar.xz", "-C", "/home/ravinder/update_temp"])
     subprocess.call(["cp", "-RT", "/home/ravinder/update_temp/v3.0_temp/script", "/usr/local/bin"])
     subprocess.call(["cp", "-RT", "/home/ravinder/update_temp/v3.0_temp/service", "/etc/systemd/system"])
